@@ -122,7 +122,7 @@ async def ask_question(question: str):
                 {
                     "source": doc.metadata.get("source", "Inconnue"),
                     "page": doc.metadata.get("page", "Inconnue"),
-                    "extrait": doc.page_content[:500]
+                    "extrait": doc.page_content[:]
                 } for doc in docs
             ]
         }
