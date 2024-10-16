@@ -1,0 +1,9 @@
+google-generativeai
+python-dotenv~=1.0.0
+langchain~=0.1.2
+pypdf2==2.0.0
+faiss-cpu
+langchain_google_genai
+fastapi 
+uvicorn
+python-multipart
