@@ -115,11 +115,15 @@ async def ask_question(question: str):
         docs = new_db.similarity_search(question)
         
         conversational_chain = get_conversational_chain()
-        response = conversational_chain.invoke(
-            {"input_documents": docs, "question": question}
-        )
+        
+        # Construire un contexte textuel à partir des documents récupérés
+        context = "\n\n".join([doc.page_content for doc in docs])
+        
+        response = conversational_chain.invoke({
+            "context": context,
+            "question": question
+        })
 
-        # Structurer la réponse
         response_data = {
             "Reponse": response["output_text"],
             "Documents": [
