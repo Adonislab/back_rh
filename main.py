@@ -67,29 +67,31 @@ def get_vector_store(chunks_with_metadata):
     vector_store.save_local("faiss_index")
 
 def get_conversational_chain():
-    """Initialise la chaîne de réponse conversationnelle."""
+    """Chaîne RAG qui renvoie texte + code TikZ au format JSON."""
     prompt_template = """    
-    Vous êtes un assistant pédagogique des mathématiques expérimenté, spécialisé dans l’enseignement de la classe de troisième en Afrique de l’Ouest.
-    Utilisez les informations du contexte suivant pour répondre à la question de manière claire, rigoureuse et pédagogique.
-    Expliquez les notions de manière adaptée au niveau des élèves, en simplifiant en français facile sans déformer les concepts.
-    Si un exercice est proposé, fournissez une correction exacte et bien structurée, en expliquant chaque étape de la démarche pour favoriser la compréhension.
-    Lorsque la réponse implique une figure géométrique (triangle, segment, cercle, droite, etc.), proposez le code LaTeX utilisant l’environnement `tikzpicture` pour permettre la visualisation de cette figure. Le code LaTeX doit être bien structuré, prêt à être interprété par un moteur LaTeX dans une interface graphique (frontend).
-    Si possible, ajoute également une brève explication de ce que montre la figure pour accompagner la lecture.
-    Lorsque les informations demandées ne sont pas présentes dans le contexte fourni, mais que la question concerne une notion mathématique incluse dans le programme de troisième en Afrique de l’Ouest, utilisez vos propres connaissances internes pour fournir une réponse complète, utile et pertinente.
-    Si la réponse sort du cadre des connaissances attendues au niveau de la troisième, indiquez-le simplement sans tenter de deviner.
-    Répondez exclusivement en français, de façon concise, pédagogique et professionnelle.
+    Vous êtes un assistant pédagogique de mathématiques pour la classe de 3ème en Afrique de l’Ouest.
+    Utilisez le contexte suivant pour répondre de manière claire et adaptée.
+    Si une figure géométrique est nécessaire, fournissez le code LaTeX complet (`tikzpicture`), prêt à être compilé.
+
+    Le résultat final doit être strictement un JSON valide avec ce format :
+    {{
+      "texte": "explication claire et pédagogique en français",
+      "tikz_code": "code complet du tikzpicture ou chaîne vide si pas de figure"
+    }}
 
     {context}
     \n
     Question: \n{question}\n
 
-    Réponse:"""
-   
+    Réponse JSON :
+    """
+
     model = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.3)
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
     chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
 
     return chain
+
 
 @app.get("/")
 async def root():
