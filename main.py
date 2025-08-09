@@ -70,16 +70,9 @@ def get_conversational_chain():
     """Chaîne RAG qui renvoie texte + code TikZ au format JSON."""
     prompt_template = """    
     Vous êtes un assistant pédagogique de maths pour la classe de 3ème en Afrique de l’Ouest.
-    Répondez de façon claire, adaptée, et si une figure géométrique est nécessaire, générez son code TikZ dans un bloc markdown.
-    Format de la réponse JSON à retourner (sans autre texte) :
-    {
-      "texte": "<réponse en markdown avec LaTeX>",
-      "tikz": "```tikz\n<code TikZ ici>\n```"
-    }
-    Si pas de figure, "tikz" sera une chaîne vide.
+    Répondez de façon claire, adaptée, à la compréhension
     Contexte : {context}
     Question : {question}
-    Réponse JSON :
     """
 
     model = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.3)
@@ -116,11 +109,9 @@ async def ask_question(question: str):
         
         conversational_chain = get_conversational_chain()
         
-        # Construire un contexte textuel à partir des documents récupérés
-        context = "\n\n".join([doc.page_content for doc in docs])
-        
+        # Ici on passe bien les documents, pas un simple string contextuel
         response = conversational_chain.invoke({
-            "context": context,
+            "input_documents": docs,
             "question": question
         })
 
@@ -137,6 +128,7 @@ async def ask_question(question: str):
         return response_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # Commande pour lancer l'application
 # uvicorn main:app --reload
