@@ -69,20 +69,16 @@ def get_vector_store(chunks_with_metadata):
 def get_conversational_chain():
     """Chaîne RAG qui renvoie texte + code TikZ au format JSON."""
     prompt_template = """    
-    Vous êtes un assistant pédagogique de mathématiques pour la classe de 3ème en Afrique de l’Ouest.
-    Utilisez le contexte suivant pour répondre de manière claire et adaptée.
-    Si une figure géométrique est nécessaire, fournissez le code LaTeX complet (`tikzpicture`), prêt à être compilé.
-
-    Le résultat final doit être strictement un JSON valide avec ce format :
-    {{
-      "texte": "explication claire et pédagogique en français",
-      "tikz_code": "code complet du tikzpicture ou chaîne vide si pas de figure"
-    }}
-
-    {context}
-    \n
-    Question: \n{question}\n
-
+    Vous êtes un assistant pédagogique de maths pour la classe de 3ème en Afrique de l’Ouest.
+    Répondez de façon claire, adaptée, et si une figure géométrique est nécessaire, générez son code TikZ dans un bloc markdown.
+    Format de la réponse JSON à retourner (sans autre texte) :
+    {
+      "texte": "<réponse en markdown avec LaTeX>",
+      "tikz": "```tikz\n<code TikZ ici>\n```"
+    }
+    Si pas de figure, "tikz" sera une chaîne vide.
+    Contexte : {context}
+    Question : {question}
     Réponse JSON :
     """
 
